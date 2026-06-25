@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Python Programming · Mind Map | Bihar Digital Data &amp; Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            background: #eef3f8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 28px 16px;
+        }
+
+        .map-wrapper {
+            width: 100%;
+            max-width: 1550px;
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(4px);
+            border-radius: 48px;
+            padding: 34px 26px 44px;
+            box-shadow: 0 22px 55px -14px rgba(8, 30, 52, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .map-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: #0b1f33;
+            padding-bottom: 16px;
+            border-bottom: 2px dashed rgba(11, 31, 51, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+
+        .map-title .pill {
+            background: #1a3f5c;
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 4px 22px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+        }
+
+        .tree-scroll {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            padding: 6px 0 2px;
+        }
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            min-width: 300px;
+        }
+
+        .root-node {
+            background: linear-gradient(145deg, #0b2a44, #1a4a74);
+            color: #fff;
+            padding: 16px 44px;
+            border-radius: 60px;
+            font-size: 1.7rem;
+            font-weight: 700;
+            box-shadow: 0 12px 30px -8px rgba(10, 40, 80, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+            cursor: default;
+            transition: transform 0.2s, box-shadow 0.3s;
+            user-select: none;
+            margin-bottom: 8px;
+        }
+
+        .root-node:hover {
+            transform: scale(1.02);
+            box-shadow: 0 18px 40px -10px rgba(10, 40, 80, 0.6);
+        }
+
+        .root-node .meta {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 400;
+            opacity: 0.75;
+            letter-spacing: 0.8px;
+            margin-top: 2px;
+        }
+
+        .root-connector {
+            width: 2px;
+            height: 24px;
+            background: linear-gradient(to bottom, #1a4a74, #7a9bb5);
+            margin-bottom: 4px;
+            border-radius: 2px;
+        }
+
+        .branches-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 22px 30px;
+            width: 100%;
+            padding: 4px 6px;
+        }
+
+        .branch {
+            flex: 1 1 190px;
+            min-width: 170px;
+            max-width: 300px;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 18px 16px 16px;
+            box-shadow: 0 6px 18px rgba(0, 20, 40, 0.07);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.25s;
+        }
+
+        .branch:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 34px -10px rgba(0, 20, 40, 0.16);
+        }
+
+        .branch-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #0b1e33;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+        }
+
+        .branch-header:hover {
+            color: #1a5a8a;
+        }
+
+        .branch-header .ico {
+            font-size: 1.3rem;
+            line-height: 1;
+        }
+
+        .branch-header .arrow {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: #7a8fa5;
+            transition: transform 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .branch-header .arrow.open {
+            transform: rotate(180deg);
+            background: rgba(26, 90, 138, 0.10);
+            color: #1a5a8a;
+        }
+
+        .branch-body {
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.3s ease, margin 0.3s;
+            max-height: 1400px;
+            opacity: 1;
+        }
+
+        .branch-body.collapsed {
+            max-height: 0 !important;
+            opacity: 0;
+            margin: 0;
+            padding-top: 0;
+        }
+
+        .child-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .child-item {
+            background: #f6fafd;
+            border-radius: 14px;
+            padding: 7px 14px 7px 16px;
+            font-size: 0.9rem;
+            color: #1a2f44;
+            border-left: 3px solid #b6cfe0;
+            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .child-item:hover {
+            background: #ecf3fa;
+            border-left-color: #2a7aaa;
+            transform: translateX(4px);
+        }
+
+        .child-item .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #7a9bb5;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .child-item:hover .dot {
+            background: #1a5a8a;
+        }
+
+        .child-item .label {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .child-item .tag {
+            font-size: 0.6rem;
+            background: rgba(26, 90, 138, 0.09);
+            color: #1a5a8a;
+            padding: 1px 12px;
+            border-radius: 30px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .nested {
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 5px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-left: 2px dashed #d0dfeb;
+            padding-left: 16px;
+        }
+
+        .nested-item {
+            font-size: 0.82rem;
+            color: #2a4058;
+            padding: 4px 10px 4px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s, transform 0.15s;
+            cursor: default;
+        }
+
+        .nested-item:hover {
+            background: rgba(26, 90, 138, 0.06);
+            transform: translateX(4px);
+        }
+
+        .nested-item .ndot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #9ab3c9;
+            flex-shrink: 0;
+        }
+
+        .branch[data-color="0"] .branch-header {
+            color: #0b4f6c;
+        }
+
+        .branch[data-color="0"] .child-item {
+            border-left-color: #5b9bbd;
+        }
+
+        .branch[data-color="1"] .branch-header {
+            color: #1d5a3e;
+        }
+
+        .branch[data-color="1"] .child-item {
+            border-left-color: #5baa7a;
+        }
+
+        .branch[data-color="2"] .branch-header {
+            color: #7a4a2a;
+        }
+
+        .branch[data-color="2"] .child-item {
+            border-left-color: #c4906a;
+        }
+
+        .branch[data-color="3"] .branch-header {
+            color: #6a3a6a;
+        }
+
+        .branch[data-color="3"] .child-item {
+            border-left-color: #b07ab0;
+        }
+
+        .branch[data-color="4"] .branch-header {
+            color: #1f4f7a;
+        }
+
+        .branch[data-color="4"] .child-item {
+            border-left-color: #6a9fc0;
+        }
+
+        .branch[data-color="5"] .branch-header {
+            color: #7a5a1f;
+        }
+
+        .branch[data-color="5"] .child-item {
+            border-left-color: #c9a06a;
+        }
+
+        .branch[data-color="6"] .branch-header {
+            color: #4a5a1f;
+        }
+
+        .branch[data-color="6"] .child-item {
+            border-left-color: #8a9a6a;
+        }
+
+        @media (max-width: 820px) {
+            .map-wrapper {
+                padding: 20px 14px 30px;
+                border-radius: 32px;
+            }
+
+            .map-title {
+                font-size: 1.5rem;
+            }
+
+            .root-node {
+                font-size: 1.3rem;
+                padding: 12px 26px;
+            }
+
+            .branches-grid {
+                gap: 16px 18px;
+            }
+
+            .branch {
+                flex: 1 1 150px;
+                min-width: 130px;
+                padding: 14px 12px 12px;
+            }
+
+            .branch-header {
+                font-size: 0.95rem;
+            }
+
+            .child-item {
+                font-size: 0.82rem;
+                padding: 6px 10px 6px 12px;
+            }
+
+            .nested-item {
+                font-size: 0.76rem;
+            }
+
+            .nested {
+                margin-left: 10px;
+                padding-left: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .map-wrapper {
+                padding: 14px 8px 20px;
+                border-radius: 20px;
+            }
+
+            .map-title {
+                font-size: 1.1rem;
+                gap: 6px;
+            }
+
+            .root-node {
+                font-size: 1rem;
+                padding: 10px 16px;
+            }
+
+            .root-connector {
+                height: 16px;
+            }
+
+            .branches-grid {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .branch {
+                flex: 1 1 100%;
+                max-width: 100%;
+                min-width: 0;
+            }
+
+            .child-item .tag {
+                display: none;
+            }
+        }
+
+        .tree-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tree-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: 10px;
+        }
+
+        .tree-scroll::-webkit-scrollbar-thumb {
+            background: #b6cfe0;
+            border-radius: 10px;
+        }
+
+        .tree-scroll::-webkit-scrollbar-thumb:hover {
+            background: #8aadc8;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 26px;
+            font-size: 0.75rem;
+            color: #8a9fb5;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-note span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .footer-note .key {
+            background: #e9eef3;
+            padding: 1px 12px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #1a3a5c;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="map-wrapper">
+        <div class="map-title">
+            <span>🧠 Python Programming</span>
+            <span class="pill">Mind Map</span>
+        </div>
+
+        <div class="tree-scroll">
+            <div class="tree" id="treeRoot">
+                <div class="root-node">
+                    Python Programming
+                </div>
+                <div class="root-connector"></div>
+                <div class="branches-grid" id="branchesContainer"></div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <span>🔹 <span class="key">Click</span> branch headers to expand/collapse</span>
+            <span>🔸 <span class="key">Hover</span> nodes for feedback</span>
+            <span>🔹 Python Programming · complete overview</span>
+            <span>🏫 <a href="https://bddn.in" target="_blank" rel="noopener noreferrer"
+                    style="color:#1a5a8a;text-decoration:none;font-weight:600;">Bihar Digital Data &amp; Network</a> ·
+                <a href="https://bddn.in" target="_blank" rel="noopener noreferrer"
+                    style="color:#1a5a8a;text-decoration:none;">bddn.in</a></span>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            {
+                "id": "branch-0",
+                "label": "Python Basics",
+                "icon": "📖",
+                "color": 0,
+                "children": [
+                    {
+                        "label": "Python Introduction and Installation",
+                        "sub": []
+                    },
+                    {
+                        "label": "Writing First Python Program",
+                        "sub": []
+                    },
+                    {
+                        "label": "Python Program Structure",
+                        "sub": []
+                    },
+                    {
+                        "label": "Python Print() Function",
+                        "sub": []
+                    },
+                    {
+                        "label": "Python Input() Function",
+                        "sub": []
+                    },
+                    {
+                        "label": "Variables in Python",
+                        "sub": []
+                    },
+                    {
+                        "label": "Python Operators",
+                        "sub": []
+                    },
+                    {
+                        "label": "Logical Operators",
+                        "sub": []
+                    },
+                    {
+                        "label": "Identity, Membership & Bitwise Operators",
+                        "sub": []
+                    }
+                ]
+            },
+            {
+                "id": "branch-1",
+                "label": "Decision Making (Conditional Statements)",
+                "icon": "📂",
+                "color": 1,
+                "children": [
+                    {
+                        "label": "Python IF Statement",
+                        "sub": []
+                    },
+                    {
+                        "label": "Programming with IF Statement",
+                        "sub": []
+                    },
+                    {
+                        "label": "Program Exercise with IF Statement",
+                        "sub": []
+                    }
+                ]
+            },
+            {
+                "id": "branch-2",
+                "label": "Loops",
+                "icon": "📊",
+                "color": 2,
+                "children": [
+                    {
+                        "label": "While Loop",
+                        "sub": [
+                            {
+                                "label": "Introduction to While Loop"
+                            },
+                            {
+                                "label": "Print First 10 Natural Numbers"
+                            },
+                            {
+                                "label": "Print First N Natural Numbers"
+                            },
+                            {
+                                "label": "Print First N Natural Numbers in Reverse"
+                            },
+                            {
+                                "label": "Sum of First N Natural Numbers"
+                            },
+                            {
+                                "label": "Sum of Squares of First N Natural Numbers"
+                            },
+                            {
+                                "label": "Print Even Numbers (1 to N)"
+                            },
+                            {
+                                "label": "Sum of Even Numbers (1 to N)"
+                            },
+                            {
+                                "label": "Sum of First N Even Numbers"
+                            },
+                            {
+                                "label": "Sum of Digits"
+                            },
+                            {
+                                "label": "Sum of Squares of Digits"
+                            },
+                            {
+                                "label": "Sum of Cubes of Digits"
+                            },
+                            {
+                                "label": "Armstrong Number (3 Digit)"
+                            },
+                            {
+                                "label": "Armstrong Number (General)"
+                            },
+                            {
+                                "label": "Product of Digits"
+                            },
+                            {
+                                "label": "Reverse a Number"
+                            },
+                            {
+                                "label": "Palindrome Number"
+                            },
+                            {
+                                "label": "Prime Number"
+                            },
+                            {
+                                "label": "Factorial Program"
+                            },
+                            {
+                                "label": "Fibonacci Series"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Nested Loop",
+                        "sub": [
+                            {
+                                "label": "Introduction to Nested Loop"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Pattern Programs",
+                        "sub": [
+                            {
+                                "label": "Right Angle Triangle"
+                            },
+                            {
+                                "label": "Reverse Right Angle Triangle"
+                            },
+                            {
+                                "label": "Pyramid Pattern"
+                            },
+                            {
+                                "label": "Opposite Pyramid Pattern"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "For Loop",
+                        "sub": [
+                            {
+                                "label": "Introduction to For Loop"
+                            },
+                            {
+                                "label": "Print Table of a Given Number"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Loop Control Statements",
+                        "sub": [
+                            {
+                                "label": "Break"
+                            },
+                            {
+                                "label": "Continue"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "branch-3",
+                "label": "Functions",
+                "icon": "🎯",
+                "color": 3,
+                "children": [
+                    {
+                        "label": "Introduction to Functions",
+                        "sub": []
+                    },
+                    {
+                        "label": "How to Use Functions",
+                        "sub": []
+                    },
+                    {
+                        "label": "Function Parameters / Arguments",
+                        "sub": []
+                    },
+                    {
+                        "label": "Functions Programming",
+                        "sub": []
+                    },
+                    {
+                        "label": "Default Arguments",
+                        "sub": []
+                    },
+                    {
+                        "label": "Function Practice",
+                        "sub": []
+                    }
+                ]
+            },
+            {
+                "id": "branch-4",
+                "label": "Strings",
+                "icon": "🔍",
+                "color": 4,
+                "children": [
+                    {
+                        "label": "Introduction to String",
+                        "sub": []
+                    },
+                    {
+                        "label": "String Slicing",
+                        "sub": []
+                    },
+                    {
+                        "label": "String Functions",
+                        "sub": []
+                    },
+                    {
+                        "label": "Reverse a String",
+                        "sub": []
+                    },
+                    {
+                        "label": "Count Vowels & Consonants",
+                        "sub": []
+                    },
+                    {
+                        "label": "String Functions Part 2",
+                        "sub": []
+                    },
+                    {
+                        "label": "String Palindrome Program",
+                        "sub": []
+                    }
+                ]
+            },
+            {
+                "id": "branch-5",
+                "label": "Lists",
+                "icon": "⚙️",
+                "color": 5,
+                "children": [
+                    {
+                        "label": "List Introduction",
+                        "sub": []
+                    },
+                    {
+                        "label": "List Slicing",
+                        "sub": []
+                    },
+                    {
+                        "label": "List Operations",
+                        "sub": []
+                    },
+                    {
+                        "label": "Accessing List Elements",
+                        "sub": []
+                    },
+                    {
+                        "label": "List Functions",
+                        "sub": [
+                            {
+                                "label": "len()"
+                            },
+                            {
+                                "label": "max()"
+                            },
+                            {
+                                "label": "min()"
+                            },
+                            {
+                                "label": "count()"
+                            },
+                            {
+                                "label": "index()"
+                            },
+                            {
+                                "label": "insert()"
+                            },
+                            {
+                                "label": "remove()"
+                            },
+                            {
+                                "label": "reverse()"
+                            },
+                            {
+                                "label": "pop()"
+                            },
+                            {
+                                "label": "Other Important Functions"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "List Programs",
+                        "sub": [
+                            {
+                                "label": "Sum of List Elements"
+                            },
+                            {
+                                "label": "Count Odd & Even Numbers"
+                            },
+                            {
+                                "label": "Search a Number"
+                            },
+                            {
+                                "label": "Count Frequency"
+                            },
+                            {
+                                "label": "Find Maximum & Minimum"
+                            },
+                            {
+                                "label": "Reverse List"
+                            },
+                            {
+                                "label": "Find Second Maximum & Second Minimum"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "branch-6",
+                "label": "Tuples",
+                "icon": "🔗",
+                "color": 6,
+                "children": [
+                    {
+                        "label": "Tuple Introduction",
+                        "sub": []
+                    },
+                    {
+                        "label": "Insert, Update & Delete Tuple Elements",
+                        "sub": []
+                    },
+                    {
+                        "label": "Indexing & Slicing",
+                        "sub": []
+                    },
+                    {
+                        "label": "Tuple Methods",
+                        "sub": []
+                    },
+                    {
+                        "label": "Creating, Updating, Deleting & Accessing Tuples",
+                        "sub": []
+                    }
+                ]
+            },
+            {
+                "id": "branch-7",
+                "label": "Dictionaries",
+                "icon": "📖",
+                "color": 0,
+                "children": [
+                    {
+                        "label": "Dictionary Introduction",
+                        "sub": []
+                    },
+                    {
+                        "label": "Add, Update & Delete Elements",
+                        "sub": []
+                    },
+                    {
+                        "label": "Dictionary Functions",
+                        "sub": []
+                    },
+                    {
+                        "label": "Working with Key-Value Pairs",
+                        "sub": []
+                    },
+                    {
+                        "label": "Searching Program in Dictionary",
+                        "sub": []
+                    }
+                ]
+            },
+            {
+                "id": "branch-8",
+                "label": "NumPy",
+                "icon": "📂",
+                "color": 1,
+                "children": [
+                    {
+                        "label": "NumPy Introduction",
+                        "sub": []
+                    },
+                    {
+                        "label": "Install NumPy (Anaconda)",
+                        "sub": []
+                    },
+                    {
+                        "label": "Writing, Compiling & Executing NumPy Programs",
+                        "sub": []
+                    },
+                    {
+                        "label": "One-Dimensional Array",
+                        "sub": []
+                    },
+                    {
+                        "label": "Two-Dimensional Array",
+                        "sub": []
+                    },
+                    {
+                        "label": "NumPy Functions",
+                        "sub": []
+                    },
+                    {
+                        "label": "Indexing & Slicing",
+                        "sub": []
+                    },
+                    {
+                        "label": "Reshaping Arrays",
+                        "sub": []
+                    },
+                    {
+                        "label": "Seed Function",
+                        "sub": []
+                    },
+                    {
+                        "label": "User Input in 2D Array",
+                        "sub": []
+                    },
+                    {
+                        "label": "Slicing Two-Dimensional Array",
+                        "sub": []
+                    },
+                    {
+                        "label": "View vs Copy",
+                        "sub": []
+                    },
+                    {
+                        "label": "Conditional Selection",
+                        "sub": []
+                    },
+                    {
+                        "label": "Operations on NumPy Arrays",
+                        "sub": []
+                    }
+                ]
+            }
+        ];
+
+        const container = document.getElementById('branchesContainer');
+
+        function renderChild(child) {
+            if (child.sub && child.sub.length) {
+                const subItems = child.sub.map(s => {
+                    const label = typeof s === 'string' ? s : s.label;
+                    return `<li class="nested-item"><span class="ndot"></span>${label}</li>`;
+                }).join('');
+                return `
+                <li class="child-item">
+                    <span class="dot"></span>
+                    <span class="label">${child.label}</span>
+                    <span class="tag">${child.sub.length}</span>
+                </li>
+                <ul class="nested">${subItems}</ul>
+            `;
+            }
+            return `
+            <li class="child-item">
+                <span class="dot"></span>
+                <span class="label">${child.label}</span>
+            </li>
+        `;
+        }
+
+        function renderBranch(branch, idx) {
+            const bodyId = `branchBody_${branch.id || idx}`;
+            const childrenHtml = branch.children.map(c => renderChild(c)).join('');
+            return `
+            <div class="branch" data-color="${branch.color}" data-branch="${branch.id || idx}">
+                <div class="branch-header" data-target="${bodyId}">
+                    <span class="ico">${branch.icon || '▪'}</span>
+                    ${branch.label}
+                    <span class="arrow open" id="toggle_${bodyId}">▾</span>
+                </div>
+                <div class="branch-body" id="${bodyId}">
+                    <ul class="child-list">
+                        ${childrenHtml}
+                    </ul>
+                </div>
+            </div>
+        `;
+        }
+
+        container.innerHTML = data.map((b, i) => renderBranch(b, i)).join('');
+
+        document.querySelectorAll('.branch-header').forEach(header => {
+            header.addEventListener('click', function (e) {
+                const targetId = this.dataset.target;
+                if (!targetId) return;
+                const body = document.getElementById(targetId);
+                const toggle = document.getElementById(`toggle_${targetId}`);
+                if (!body || !toggle) return;
+                const isCollapsed = body.classList.contains('collapsed');
+                if (isCollapsed) {
+                    body.classList.remove('collapsed');
+                    toggle.classList.add('open');
+                    body.style.maxHeight = body.scrollHeight + 'px';
+                    setTimeout(() => { body.style.maxHeight = 'none'; }, 420);
+                } else {
+                    body.style.maxHeight = body.scrollHeight + 'px';
+                    void body.offsetHeight;
+                    body.style.maxHeight = '0';
+                    body.classList.add('collapsed');
+                    toggle.classList.remove('open');
+                }
+            });
+            header.setAttribute('role', 'button');
+            header.setAttribute('tabindex', '0');
+            header.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        });
+
+        document.querySelectorAll('.branch-body').forEach(body => {
+            body.style.maxHeight = body.classList.contains('collapsed') ? '0' : 'none';
+        });
+    </script>
+</body>
+
+</html>
